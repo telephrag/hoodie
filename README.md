@@ -19,7 +19,7 @@ How to:
  - download this repository
  - `go build -o=hoodie main.go` inside downloaded directory on Linux
  - `go build -o=hoodie.exe main.go` on Windows
- - on Linux executable will be `main` and `main.exe` on Windows
+ - on Linux executable will be `hoodie` and `hoodie.exe` on Windows
 
 # Usage
 
