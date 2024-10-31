@@ -1,4 +1,4 @@
-module main
+module hoodie
 
 go 1.21.3
 
