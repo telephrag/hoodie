@@ -1,0 +1,13 @@
+trait software {
+	editor$linux   nvim
+	editor$windows sublimetext3
+}
+
+// $ denotes conditional tag
+// e.g. first line shall compile into ("editor" "nvim" [$linux])
+// Also, only the last $ is considered when parsing tags so,
+// (k$$tag v) -> ("k$" "v" [$tag]). A bit useless feature. 
+// 
+// Escape sequences are not required as, every key or value will be quoted,
+// however $ becomes practically illegal symbol in most use cases as,
+// it will add unwanted conditional tag.

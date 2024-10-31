@@ -1,0 +1,23 @@
+{
+	"laptop.hoo": "output/laptop.vdf",
+	"os.hoo": "_",
+	"software.hoo": "_"
+}
+
+This file contains build schema. 
+It must have a name `build.json` which is hard-coded. 
+Format is: ("%file.hoo%": "path/to/output/to.format")
+"_" is for files with traits which are used only in compilation of other files.
+As of now, if output path contains directory, 
+said directory must exist prior to compilation.
+NOTE: .hoo files must be specified only by their name
+	"traits/os.hoo": "_" -- won't compile
+    "os.hoo": "_"        -- ok
+To find out how `hoodie` works take a look inside files listed above.
+
+To compile project:
+ - remove text outside of `{}` and rename this file to "build.json".
+ - build hoodie or download executable from "releases" section
+   at hoodie's github page
+ - run executable with flag -d=path/to/project/directory
+

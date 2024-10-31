@@ -1,0 +1,22 @@
+laptop {
+	hardware {
+		apu    amd
+		screen 1366x768
+	}
+		
+	// Block bellow will include pairs of values 
+	// from respective traits declared elsewhere. 
+	// Hoodie finds where these traits are declared via build.json file.
+	//
+	// Traits can't be nested or nest but can be applied to nested blocks.
+	// Order of compilation: traits left to right then block itself.
+	// The value at key from later block in the queue will override
+	// value at the same key from the preceeding one.
+	programs os software {
+		bios   shitty_one_from_hp // whitespace is not allowed
+		random !@#$%^&&**{}[]     // otherwise anything's good
+		
+		editor$windows kate // overrides the value at key from trait `software`
+	}
+}
+

@@ -1,0 +1,7 @@
+trait os {
+	linux_distro alpine
+	windows_iso  revision
+}
+
+// Usual trait declaration, nothing special.
+// Traits can not nest other blocks nor be nested themselves.
