@@ -77,6 +77,7 @@ func (b *Block) WriteRaw(raw []string) {
 }
 
 func (b *Block) Add(other *Block) error {
+	// TODO: other.Parse() will run checks that we don't need when parsing traits
 	if err := other.Parse(); err != nil {
 		return err
 	}

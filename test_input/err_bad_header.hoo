@@ -1,0 +1,4 @@
+
+{ // no "{", should error durring parsing
+	k v
+}

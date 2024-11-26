@@ -1,0 +1,8 @@
+{
+	"block_ok.hoo": "output.vdf",
+	"trat_ok.hoo": "_",
+	"err_trait_exists.hoo": "_",
+	"err_block_not_enclosed.hoo": "_",
+	"err_bad_trait_header.hoo": "_",
+	"err_bad_header.hoo": "_"
+}

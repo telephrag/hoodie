@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io"
 	"io/fs"
 	"log"
@@ -18,8 +19,17 @@ func init() {
 }
 
 func main() {
-	workDir := flag.String("d", ".", "Specify sourcefile directory.")
+	workDir := flag.String("d", ".", "Specifies sourcecode directory.")
+
+	errFunc := log.Fatal
+	flag.BoolFunc("c", "Specifies wether to continue parsing project on error in one of the files.", func(string) error {
+		errFunc = log.Println
+		return nil
+	})
+
 	flag.Parse()
+
+	fmt.Println(*workDir)
 	if err := os.Chdir(*workDir); err != nil {
 		log.Fatal(err)
 	}
@@ -80,29 +90,33 @@ func main() {
 
 	for _, h := range hoodies {
 		if err := h.Parse(); err != nil {
-			log.Fatal(err)
+			errFunc(err)
 		}
 	}
 
 	if err := block.ValidateTrates(); err != nil {
-		log.Fatal(err)
+		errFunc(err)
 	}
 
 	for _, h := range hoodies {
 		if err := h.ParseHead(); err != nil {
-			log.Fatal(h.SrcPath(), err)
+			errFunc(err)
 		}
 	}
 
 	for _, h := range hoodies {
 		if err := h.WriteOutput(); err != nil {
-			log.Fatal(err)
+			errFunc(err)
 		}
 	}
 }
 
+// Do all errors contain src path?
+
 // TODO: Improve error handling. Provide line #
 // 	where error has occured in all use-cases.
+// 		write test or files where error is supposed to occure
 // TODO: Make tabulation in output files pretty
 // TODO: Compile each file in a seperate thread
-// TODO: Write documentation
+// TODO: Allow the same output destination for multiple .hoo files
+// TODO: Allow #include and #base statements

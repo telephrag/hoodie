@@ -1,0 +1,6 @@
+
+// this one exists to proc other errors
+// or to be used correctly
+trait traitName {
+	x y
+}

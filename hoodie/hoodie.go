@@ -143,18 +143,7 @@ func (h *Hoodie) PrintTree() {
 }
 
 /*
-TODO: use patterm matching from `mo` package?
-	patterns:
-		a "trait" "trait_name" "{"
-			traits are literally never gonna be declared inside block why bother?
-		b "word" "{"
-		c "word" "trait_name" ... "{"
-		d "word" "word"
-		e "}"
-
-		trat {} block as value and block name as a key?
-
-Is order of declaring blocks and pairs significant?
+TODO: Is order of declaring blocks and pairs significant?
 If yes, conditionals (e.g. if_match) can cause issues
 Need more info if we're to allow nested blocks inside traits
 

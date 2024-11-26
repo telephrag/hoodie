@@ -1,0 +1,9 @@
+
+blockName traitName {
+	k v
+	x d
+
+	nested traitName {
+		a b
+	}
+}

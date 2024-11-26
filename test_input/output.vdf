@@ -1,0 +1,11 @@
+
+"blockName"
+{
+	"k" "v" 
+	"x" "d" 
+
+	"nested"
+	{
+		"a" "b" 
+	}
+}

@@ -1,0 +1,4 @@
+
+block_name {
+	k v
+// should fail here as there is no "}"

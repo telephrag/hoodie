@@ -1,0 +1,5 @@
+
+// supposed to fail due to being duplicate
+// when its header is parsed
+trait traitName {
+}
