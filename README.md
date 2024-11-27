@@ -17,12 +17,14 @@ Dependecies:
 
 How to:
  - download this repository
- - `go build -o=hoodie main.go` inside downloaded directory on Linux
- - `go build -o=hoodie.exe main.go` on Windows
- - on Linux executable will be `main` and `main.exe` on Windows
+ - `go build -o=hoo main.go` inside downloaded directory on Linux
+ - `go build -o=hoo.exe main.go` on Windows
+ - on Linux executable will be `hoo` and `hoo.exe` on Windows
 
 # Usage
 
-Windows: `hoodie.exe -d=path\to\project`
+See folder `example` and its contents. 
 
-Linux: `hoodie -d=path/to/project`
+Windows: `.\hoo.exe -d=path\to\project`
+
+Linux: `./hoo -d=path/to/project`
