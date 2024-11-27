@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io"
 	"io/fs"
 	"log"
@@ -16,21 +15,12 @@ import (
 
 func init() {
 	log.SetFlags(log.Flags() &^ log.LstdFlags)
+
 }
 
-func main() {
-	workDir := flag.String("d", ".", "Specifies sourcecode directory.")
+func Run(wd string, ef func(error)) {
 
-	errFunc := log.Fatal
-	flag.BoolFunc("c", "Specifies wether to continue parsing project on error in one of the files.", func(string) error {
-		errFunc = log.Println
-		return nil
-	})
-
-	flag.Parse()
-
-	fmt.Println(*workDir)
-	if err := os.Chdir(*workDir); err != nil {
+	if err := os.Chdir(wd); err != nil {
 		log.Fatal(err)
 	}
 
@@ -67,10 +57,6 @@ func main() {
 		log.Fatalf("errored while looking for files to compile: %s\n", err)
 	}
 
-	//	fmt.Println(srcNames)
-	//	fmt.Println(srcPaths)
-	//	fmt.Println(buildSchema)
-
 	lf := len(srcPaths)
 	lb := len(buildSchema)
 	if lf != lb {
@@ -84,31 +70,45 @@ func main() {
 		if err != nil {
 			log.Fatalf("failed to open .hoo file %s: %s\n", srcPaths[i], err)
 		}
-		// fmt.Println(buildSchema[srcNames[i]], srcNames[i], srcPaths[i])
 		hoodies[i] = hoodie.New(f, buildSchema[srcNames[i]], srcPaths[i])
 	}
 
 	for _, h := range hoodies {
 		if err := h.Parse(); err != nil {
-			errFunc(err)
+			ef(err)
 		}
 	}
 
 	if err := block.ValidateTrates(); err != nil {
-		errFunc(err)
+		ef(err)
 	}
 
 	for _, h := range hoodies {
 		if err := h.ParseHead(); err != nil {
-			errFunc(err)
+			ef(err)
 		}
 	}
 
 	for _, h := range hoodies {
 		if err := h.WriteOutput(); err != nil {
-			errFunc(err)
+			ef(err)
 		}
 	}
+}
+
+func main() {
+	var errFunc = func(err error) { log.Fatal(err) }
+	var workDir string
+
+	workDir = *flag.String("d", ".", "Specifies sourcecode directory.")
+
+	flag.BoolFunc("c", "Specifies wether to continue parsing project on error in one of the files.", func(string) error {
+		errFunc = func(err error) { log.Println(err) }
+		return nil
+	})
+
+	flag.Parse()
+	Run(workDir, errFunc)
 }
 
 // Do all errors contain src path?

@@ -1,5 +1,5 @@
 
-traitName {
+trait name lol {
 	// don't need anything here
 	// as parsing will fail during parsing of the header
 }

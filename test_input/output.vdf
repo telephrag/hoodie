@@ -1,11 +1,5 @@
 
-"blockName"
+"block_name"
 {
 	"k" "v" 
-	"x" "d" 
-
-	"nested"
-	{
-		"a" "b" 
-	}
 }

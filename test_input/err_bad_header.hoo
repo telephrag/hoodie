@@ -1,4 +1,4 @@
 
-{ // no "{", should error durring parsing
+{ // no title, should error durring parsing
 	k v
 }
