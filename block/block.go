@@ -15,7 +15,8 @@ var ErrTraitNests = errors.New("trait nests other blocks")
 var ErrTraitNested = errors.New("trait is nested inside another block")
 var ErrNotPair = errors.New("not a pair")
 var ErrTraitExists = errors.New("trait already exists (name is not unique)")
-var ErrBadConditional = errors.New("bad conditional")
+
+// var ErrBadConditional = errors.New("bad conditional")
 
 var traits map[string]*Block = make(map[string]*Block)
 
@@ -24,7 +25,7 @@ type Block struct {
 	srcPath   string
 	startLine int
 	line      int
-	raw       [][]string
+	rawTokens [][]string
 	contents  map[string]string
 	parsed    bool
 	head      bool
@@ -43,7 +44,7 @@ func New(srcPath string, startLine int) *Block {
 	b := &Block{}
 	b.startLine = startLine
 	b.line = startLine
-	b.raw = make([][]string, 0)
+	b.rawTokens = make([][]string, 0)
 	b.contents = map[string]string{}
 	b.children = make([]*Block, 0)
 	return b
@@ -52,8 +53,8 @@ func New(srcPath string, startLine int) *Block {
 func (b *Block) IsHead() bool { return b.head }
 
 func (b *Block) Header() string {
-	if len(b.raw) != 0 {
-		return fmt.Sprint(b.raw[0])
+	if len(b.rawTokens) != 0 {
+		return fmt.Sprint(b.rawTokens[0])
 	}
 	return ""
 }
@@ -73,11 +74,10 @@ func (b *Block) AttachChild(child *Block, line int) *Block {
 }
 
 func (b *Block) WriteRaw(raw []string) {
-	b.raw = append(b.raw, raw)
+	b.rawTokens = append(b.rawTokens, raw)
 }
 
 func (b *Block) Add(other *Block) error {
-	// TODO: other.Parse() will run checks that we don't need when parsing traits
 	if err := other.Parse(); err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func (b *Block) Add(other *Block) error {
 // Called when `{` is encountered by `hoodie.Parse()`
 func (b *Block) ParseHeader() (isTrait bool, err error) {
 
-	name := b.raw[0]
+	name := b.rawTokens[0]
 	if len(name) < 2 { // expecting at least name and `{`
 		return false, ErrBadHeader
 	}
@@ -132,7 +132,8 @@ func (b *Block) Parse() error {
 	defer func() { b.parsed = true }()
 
 	contents := make(map[string]string)
-	for _, line := range b.raw[1:] {
+	for _, line := range b.rawTokens[1:] {
+		// TODO: make use of `i` (_ r.n.) to provide correct line on error
 		left, right, err := parsePair(line)
 		if err != nil {
 			return b.Err(err)

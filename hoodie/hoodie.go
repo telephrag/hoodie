@@ -14,16 +14,14 @@ import (
 
 const SPACE_TAB = "\u0020\u0009"
 
+// TODO: most of these are unused, see comment bellow
 var ErrUnexpectedToken = errors.New("unexpected token")
 var ErrIllegalSymbolUsed = errors.New("reserved symbols used")
 var ErrBlockNotEnclosed = errors.New("block is not enclosed")
-var ErrFileExtension = errors.New("file extension must be .hoo")
 var ErrSymbolsAfterBracket = errors.New("encountered symbols after \"{\"")
-var ErrNamelessBlock = errors.New("block without name")
 
 type Hoodie struct {
 	scanner     *bufio.Scanner
-	r           io.Reader
 	srcPath     string
 	outputPath  string
 	raw         [][]string
@@ -35,7 +33,6 @@ func New(r io.Reader, outputPath, srcPath string) *Hoodie {
 
 	return &Hoodie{
 		scanner:    bufio.NewScanner(r),
-		r:          r,
 		srcPath:    srcPath,
 		outputPath: outputPath,
 		raw:        make([][]string, 0),
@@ -50,37 +47,40 @@ func (h *Hoodie) scan() bool {
 
 // TODO: This is incredibly ugly. Rework error handling.
 //
-//	Create additional error types for various occasions.
+//	Create additional error types for various occasions. See above.
 func (h *Hoodie) SrcPath() string {
 	return h.srcPath
 }
 
-// Performs initial read of the file into memory
-// Check for balanced braces, removes whitespace and comments
+// Performs initial read of the file into memory;
+// checks for balanced braces, removes whitespace and comments.
+// Each file has a tree of blocks with imaginary head as a root.
 func (h *Hoodie) Parse() error {
-	var left, right int
-	location := h.head // pointer to block being parsed
+	var leftCurly, rightCurly int // need even count of these
+	location := h.head            // parse from the root
 	for h.scan() {
-
 		raw := h.scanner.Text()
-		if strings.Index(raw, "//") != -1 {
-			raw = raw[:strings.Index(raw, "//")]
+
+		// split will be to slow, slice with index
+		if si := strings.Index(raw, "//"); si != -1 {
+			raw = raw[:si]
 		}
 
-		line := lo.Compact(strings.FieldsFunc(raw, func(r rune) bool {
+		// strings.Split will give us empty lines so, we use `lo`
+		tokens := lo.Compact(strings.FieldsFunc(raw, func(r rune) bool {
 			return strings.ContainsRune(SPACE_TAB, r)
 		}))
 
-		if len(line) == 0 {
+		if len(tokens) == 0 {
 			continue
 		}
 
 		// TODO: head dosen't have `{`, can this cause issues?
 		// 		head doesn't have it's own line in the file so maybe no
-		if lo.Contains(line, "{") {
-			left++
+		if lo.Contains(tokens, "{") {
+			leftCurly++
 			b := block.New(h.srcPath, h.currentLine)
-			b.WriteRaw(line)
+			b.WriteRaw(tokens)
 			// Parsing headers ahead of time for lazy trait evaluation
 			isTrait, err := b.ParseHeader()
 			if err != nil {
@@ -94,16 +94,16 @@ func (h *Hoodie) Parse() error {
 			continue
 		}
 
-		if lo.Contains(line, "}") {
-			right++
+		if lo.Contains(tokens, "}") {
+			rightCurly++
 			location = location.Parent()
 			continue
 		}
 
-		location.WriteRaw(line)
+		location.WriteRaw(tokens)
 	}
 
-	if left != right {
+	if leftCurly != rightCurly {
 		return h.Err(ErrBlockNotEnclosed)
 	}
 

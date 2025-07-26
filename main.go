@@ -124,13 +124,17 @@ func main() {
 	var errFunc = func(err error) { log.Fatal(err) }
 
 	var workDir = flag.String("d", ".", "Sourcecode directory.")
-	var buildSchemaFileName = flag.String("s", "build.json", "Build schema file's name.")
+
+	var buildSchemaFileName = flag.String("s", "build.json",
+		"Build schema file's name.")
+
 	flag.BoolFunc("c", "Wether to continue parsing project on error.",
 		func(string) error {
 			errFunc = func(err error) { log.Println(err) }
 			return nil
 		},
 	)
+
 	flag.Parse()
 
 	fmt.Println(*workDir)
@@ -143,6 +147,11 @@ func main() {
 // DONE: Problems finding build.json, try ./main test_input/project/
 // DONE: Allow passing name of .json build schema
 
+// TODO: block.Add(): other.Parse() will run checks
+// 		that we don't need when parsing traits
+// TODO: Add some compilation tags
+// 	> forgot which ones
+// TODO: Propose IndexRight, IndexLeft
 // TODO: Improve error handling.
 //	> Provide line # where error has occured in all use-cases.
 // 	> Write test or files where error is supposed to occure
