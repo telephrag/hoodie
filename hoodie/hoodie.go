@@ -14,11 +14,12 @@ import (
 
 const SPACE_TAB = "\u0020\u0009"
 
-// TODO: most of these are unused, see comment bellow
+// TODO: Implement?
 var ErrUnexpectedToken = errors.New("unexpected token")
 var ErrIllegalSymbolUsed = errors.New("reserved symbols used")
-var ErrBlockNotEnclosed = errors.New("block is not enclosed")
-var ErrSymbolsAfterBracket = errors.New("encountered symbols after \"{\"")
+
+var ErrBlockNotEnclosed = errors.New("uneven amount of left and right braces")
+var ErrClosingBrace = errors.New("expected only closing curly brace")
 
 type Hoodie struct {
 	scanner     *bufio.Scanner
@@ -30,7 +31,6 @@ type Hoodie struct {
 }
 
 func New(r io.Reader, outputPath, srcPath string) *Hoodie {
-
 	return &Hoodie{
 		scanner:    bufio.NewScanner(r),
 		srcPath:    srcPath,
@@ -45,18 +45,15 @@ func (h *Hoodie) scan() bool {
 	return h.scanner.Scan()
 }
 
-// TODO: This is incredibly ugly. Rework error handling.
-//
-//	Create additional error types for various occasions. See above.
 func (h *Hoodie) SrcPath() string {
 	return h.srcPath
 }
 
 // Performs initial read of the file into memory;
 // checks for balanced braces, removes whitespace and comments.
-// Each file has a tree of blocks with imaginary head as a root.
+// Builds tree of blocks each file contains with imaginary head as a root.
 func (h *Hoodie) Parse() error {
-	var leftCurly, rightCurly int // need even count of these
+	var leftCurly, rightCurly int // need even amount of these
 	location := h.head            // parse from the root
 	for h.scan() {
 		raw := h.scanner.Text()
@@ -75,11 +72,9 @@ func (h *Hoodie) Parse() error {
 			continue
 		}
 
-		// TODO: head dosen't have `{`, can this cause issues?
-		// 		head doesn't have it's own line in the file so maybe no
 		if lo.Contains(tokens, "{") {
 			leftCurly++
-			b := block.New(h.srcPath, h.currentLine)
+			b := block.New(h.srcPath)
 			b.WriteRaw(tokens)
 			// Parsing headers ahead of time for lazy trait evaluation
 			isTrait, err := b.ParseHeader()
@@ -95,6 +90,9 @@ func (h *Hoodie) Parse() error {
 		}
 
 		if lo.Contains(tokens, "}") {
+			if len(tokens) > 1 {
+				h.Err(ErrClosingBrace)
+			}
 			rightCurly++
 			location = location.Parent()
 			continue
@@ -116,7 +114,7 @@ func (h *Hoodie) ParseHead() error {
 }
 
 func (h *Hoodie) WriteOutput() error {
-	// files without this output path don't need to be written
+	// files with this output path don't need to be written
 	if h.outputPath == "_" {
 		return nil
 	}

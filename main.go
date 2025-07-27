@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io"
 	"io/fs"
 	"log"
@@ -26,16 +25,12 @@ func Run(workDir, buildSchemaFileName string, ef func(error)) {
 		log.Fatalf("invalid path to project: %s\n", err)
 	}
 
-	if err := os.Chdir(workDir); err != nil {
-		log.Fatal(err)
-	}
-
 	// Just file realted shit. Scroll until the next comment.
 	var buildFilePath string
 	var buildFileFound bool
 	srcPaths, srcNames := []string{}, []string{}
 
-	err = filepath.WalkDir(".",
+	err = filepath.WalkDir(workDir,
 		func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
@@ -48,12 +43,11 @@ func Run(workDir, buildSchemaFileName string, ef func(error)) {
 
 			if d.Name() == buildSchemaFileName {
 				if buildFileFound {
-					log.Fatalf("another %s found at %s\n", buildSchemaFileName, path)
+					log.Fatalf(
+						"another %s found at %s\n", buildSchemaFileName, path)
 				}
-
 				buildFilePath += path
 				buildFileFound = true
-
 			}
 
 			return nil
@@ -82,11 +76,14 @@ func Run(workDir, buildSchemaFileName string, ef func(error)) {
 	}
 
 	lf, lb := len(srcPaths), len(buildSchema)
-	if lf != lb {
+	if lf < lb {
 		log.Fatalf("build schema: %d entries; files found: %d\n", lb, lf)
 	}
 
 	// Actual work starts here
+	if err := os.Chdir(workDir); err != nil {
+		log.Fatal(err)
+	}
 	hoodies := make([]*hoodie.Hoodie, len(srcPaths))
 	for i := range srcPaths {
 
@@ -137,8 +134,6 @@ func main() {
 
 	flag.Parse()
 
-	fmt.Println(*workDir)
-
 	Run(*workDir, *buildSchemaFileName, errFunc)
 }
 
@@ -146,18 +141,20 @@ func main() {
 
 // DONE: Problems finding build.json, try ./main test_input/project/
 // DONE: Allow passing name of .json build schema
+// FAIL: block.Parse(): line # will be wrong if `b` has children between pairs
+// DONE: Remove blank line at the beginning of each block
+// DONE: disallow anything else in lines with }
 
 // TODO: block.Add(): other.Parse() will run checks
 // 		that we don't need when parsing traits
 // TODO: Add some compilation tags
-// 	> forgot which ones
+// 	> should work like conditionnal OS tags
 // TODO: Propose IndexRight, IndexLeft
 // TODO: Improve error handling.
-//	> Provide line # where error has occured in all use-cases.
+//	> Provide line # where error has occured in all use-cases. **fail**
 // 	> Write test or files where error is supposed to occure
-//  > Return specific error types to be more concise
-// TODO: Make tabulation in output files pretty
-// TODO: Compile each file in a seperate thread
-// TODO: Allow the same output destination for multiple .hoo files
-// TODO: Allow #include and #base statements
-// 	> why? hoodie does the same but differently
+//  > Return specific error types to be more concise **done**
+// TODO: Allign keys and values in columns in output files
+// TODO: Multithreading
+// 	> Compile each file in a seperate thread
+//  > Allow the same output destination for multiple .hoo files
