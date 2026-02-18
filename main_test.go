@@ -1,4 +1,4 @@
-package main_test
+package main
 
 import (
 	"bufio"
@@ -93,7 +93,7 @@ func storeError(err error) {
 }
 
 func TestMain(t *testing.T) {
-	Run("test_input/project/", func(err error) { log.Fatal(err) })
+	Run("test_input/project/", "build.json", func(err error) { log.Fatal(err) })
 
 	mismatches, err := compareOutputs(
 		"test_input/project/output/laptop.vdf",

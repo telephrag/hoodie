@@ -24,8 +24,8 @@ type Block struct {
 	name      []string // name and all traits
 	srcPath   string
 	rawTokens [][]string
-	contents  map[string]string
-	parsed    bool
+	contents  map[string]string // TODO: iteration order isn't deterministic...
+	parsed    bool              // 	change to slice
 	isHead    bool
 	parent    *Block
 	children  []*Block
@@ -136,7 +136,7 @@ func (b *Block) Parse() error {
 		// TODO: line # won't be correct if `b` has children between pairs
 	}
 
-	if len(b.name) > 1 {
+	if len(b.name) > 1 { // can be not trait but have no traits as well
 		for _, traitName := range b.name[1:] {
 			if err := b.Add(traits[traitName]); err != nil {
 				return err

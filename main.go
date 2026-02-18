@@ -32,6 +32,7 @@ func Run(workDir, buildSchemaFileName string, ef func(error)) {
 
 	err = filepath.WalkDir(workDir,
 		func(path string, d fs.DirEntry, err error) error {
+
 			if err != nil {
 				return err
 			}
@@ -125,7 +126,7 @@ func main() {
 	var buildSchemaFileName = flag.String("s", "build.json",
 		"Build schema file's name.")
 
-	flag.BoolFunc("c", "Wether to continue parsing project on error.",
+	flag.BoolFunc("c", "Weather to continue parsing project on error.",
 		func(string) error {
 			errFunc = func(err error) { log.Println(err) }
 			return nil
@@ -145,8 +146,6 @@ func main() {
 // DONE: Remove blank line at the beginning of each block
 // DONE: disallow anything else in lines with }
 
-// TODO: block.Add(): other.Parse() will run checks
-// 		that we don't need when parsing traits
 // TODO: Add some compilation tags
 // 	> should work like conditionnal OS tags
 // TODO: Propose IndexRight, IndexLeft

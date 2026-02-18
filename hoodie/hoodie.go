@@ -7,9 +7,8 @@ import (
 	"io"
 	"main/block"
 	"os"
+	"slices"
 	"strings"
-
-	"github.com/samber/lo"
 )
 
 const SPACE_TAB = "\u0020\u0009"
@@ -64,15 +63,16 @@ func (h *Hoodie) Parse() error {
 		}
 
 		// strings.Split will give us empty lines so, we use `lo`
-		tokens := lo.Compact(strings.FieldsFunc(raw, func(r rune) bool {
-			return strings.ContainsRune(SPACE_TAB, r)
-		}))
+		tokens := strings.Fields(raw)
+		// lo.Compact(strings.FieldsFunc(raw, func(r rune) bool {
+		//	return strings.ContainsRune(SPACE_TAB, r)
+		// }))
 
 		if len(tokens) == 0 {
 			continue
 		}
 
-		if lo.Contains(tokens, "{") {
+		if slices.Contains(tokens, "{") {
 			leftCurly++
 			b := block.New(h.srcPath)
 			b.WriteRaw(tokens)
@@ -89,7 +89,7 @@ func (h *Hoodie) Parse() error {
 			continue
 		}
 
-		if lo.Contains(tokens, "}") {
+		if slices.Contains(tokens, "}") {
 			if len(tokens) > 1 {
 				h.Err(ErrClosingBrace)
 			}

@@ -1,20 +1,17 @@
-
 "laptop"
 {
-
 	"hardware"
 	{
-		"apu" "amd" 
 		"screen" "1366x768" 
+		"apu" "amd" 
 	}
-
 	"programs"
 	{
+		"bios" "shitty_one_from_hp" 
+		"random" "!@#$%^&&**{}[]" 
 		"linux_distro" "alpine" 
 		"windows_iso" "revision" 
 		"editor" "nvim" [$linux]
 		"editor" "kate" [$windows]
-		"bios" "shitty_one_from_hp" 
-		"random" "!@#$%^&&**{}[]" 
 	}
 }
